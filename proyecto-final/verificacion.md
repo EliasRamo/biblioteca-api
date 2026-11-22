@@ -22,6 +22,16 @@ Las pruebas se realizaron utilizando Docker Compose, PowerShell, solicitudes HTT
 
 **Verificación de migraciones:** Se creó un contenedor temporal e independiente de MySQL para comprobar la ejecución automática de los archivos SQL. Los registros confirmaron la ejecución de `001_init.sql` y `002_laptops.sql`, sin modificar la base de datos principal.
 
+### Evidencias del entorno
+
+**Docker y contenedores**
+
+![Docker y contenedores](<evidencias/Docker y contenedores.png>)
+
+**Estado de la API**
+
+![Estado de la API](<evidencias/Estado de la API.png>)
+
 ## 3. Verificación de funcionalidades existentes
 
 | Prueba | Resultado obtenido | Estado |
@@ -37,6 +47,16 @@ Las pruebas se realizaron utilizando Docker Compose, PowerShell, solicitudes HTT
 | Acceso sin token | La API respondió con HTTP 401 | Aprobado |
 
 Las pruebas confirmaron que el registro, la autenticación y las operaciones principales del módulo de libros continúan funcionando.
+
+### Evidencias de autenticación y módulo de libros
+
+**Registro e inicio de sesión**
+
+![Registro e inicio de sesión](<evidencias/Registro e inicio de sesión.png>)
+
+**Catálogo y préstamos de libros**
+
+![Catálogo y préstamos de libros](<evidencias/Catálogo y préstamos de libros.png>)
 
 ## 4. Verificación de préstamos de laptops
 
@@ -57,6 +77,16 @@ Las pruebas confirmaron que el registro, la autenticación y las operaciones pri
 | Registro de laptops por estudiantes | La API rechazó la operación con error HTTP 403 | Aprobado |
 | Registrar número de serie duplicado | La API rechazó el segundo registro de LAP-001 con HTTP 409 | Aprobado |
 
+### Evidencias del módulo de laptops
+
+**Inventario de laptops**
+
+![Inventario de laptops](<evidencias/Inventario de laptops.png>)
+
+**Préstamos de laptops**
+
+![Préstamos de laptops](<evidencias/Préstamos de laptops.png>)
+
 ## 5. Reglas de negocio por verificar
 
 - Cada laptop se registra como un elemento individual.
@@ -73,7 +103,7 @@ Las pruebas confirmaron que el registro, la autenticación y las operaciones pri
 
 **Observación:** Las reglas de duración, disponibilidad, devolución y control de acceso fueron comprobadas mediante pruebas funcionales. La restricción de número de serie único también fue probada intentando registrar nuevamente la laptop `LAP-001`. La base de datos rechazó el registro duplicado mediante la restricción `UNIQUE` y la API respondió correctamente con HTTP 409 (Conflict).
 
-### Verificación adicional de casos de error
+### 5.1. Verificación adicional de casos de error
 
 | Prueba | Resultado obtenido | Estado |
 |---|---|---|
@@ -83,6 +113,24 @@ Las pruebas confirmaron que el registro, la autenticación y las operaciones pri
 | Devolver un préstamo inexistente | HTTP 404 | Aprobado |
 | Solicitar una laptop que ya está prestada | La API rechazó la solicitud | Aprobado |
 | Registrar una laptop con número de serie duplicado | La API rechazó el registro con HTTP 409 y un mensaje explicativo | Aprobado |
+
+### Evidencias de seguridad y casos de error
+
+**Acceso sin token (HTTP 401)**
+
+![Acceso sin token (HTTP 401)](<evidencias/Acceso sin token (HTTP 401).png>)
+
+**Restricción de roles (HTTP 403)**
+
+![Restricción de roles (HTTP 403)](<evidencias/Restricción de roles (HTTP 403).png>)
+
+**Número de serie duplicado (HTTP 409)**
+
+![Número de serie duplicado (HTTP 409)](<evidencias/Número de serie duplicado (HTTP 409).png>)
+
+**Devolución inexistente (HTTP 404)**
+
+![Devolución inexistente (HTTP 404)](<evidencias/Devolución inexistente (HTTP 404).png>)
 
 ## 6. Compatibilidad con el sistema anterior
 
