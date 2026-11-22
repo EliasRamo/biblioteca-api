@@ -54,3 +54,20 @@ func AdminRequired() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+
+// StudentRequired permite el acceso únicamente a estudiantes.
+func StudentRequired() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, _ := c.Get("role")
+
+		if role != "student" {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": "se requiere rol de estudiante",
+			})
+			return
+		}
+
+		c.Next()
+	}
+}

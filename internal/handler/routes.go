@@ -1,3 +1,4 @@
+
 package handler
 
 import (
@@ -14,6 +15,7 @@ func SetupRoutes(
 	authHandler *AuthHandler,
 	bookHandler *BookHandler,
 	loanHandler *LoanHandler,
+	laptopHandler *LaptopHandler,
 	jwtSecret string,
 ) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -28,34 +30,54 @@ func SetupRoutes(
 
 	api := router.Group("/api")
 
-	// Rutas públicas de autenticación
+	// Rutas públicas de autenticación.
 	auth := api.Group("/auth")
 	{
 		auth.POST("/register", authHandler.Register)
 		auth.POST("/login", authHandler.Login)
 	}
 
-	// A partir de aquí, todas las rutas requieren un token JWT válido
+	// Rutas para usuarios autenticados.
 	protected := api.Group("")
 	protected.Use(middleware.AuthRequired(jwtSecret))
 	{
 		protected.GET("/auth/me", authHandler.Me)
 
+		// Libros.
 		protected.GET("/books", bookHandler.List)
 		protected.GET("/books/:id", bookHandler.Get)
 
+		// Préstamos de libros.
 		protected.POST("/loans", loanHandler.Borrow)
 		protected.GET("/loans/me", loanHandler.MyLoans)
 		protected.PUT("/loans/:id/return", loanHandler.Return)
+
+		// Laptops disponibles.
+		protected.GET("/laptops", laptopHandler.ListAll)
 	}
 
-	// Rutas exclusivas para administradores
+	// Rutas exclusivas para estudiantes.
+	student := api.Group("")
+	student.Use(middleware.AuthRequired(jwtSecret), middleware.StudentRequired())
+	{
+		student.POST("/laptop-loans", laptopHandler.Borrow)
+		student.GET("/laptop-loans/me", laptopHandler.MyLoans)
+		student.PUT("/laptop-loans/:id/return", laptopHandler.Return)
+	}
+
+	// Rutas exclusivas para administradores.
 	admin := api.Group("")
 	admin.Use(middleware.AuthRequired(jwtSecret), middleware.AdminRequired())
 	{
+		// Administración de libros.
 		admin.POST("/books", bookHandler.Create)
 		admin.PUT("/books/:id", bookHandler.Update)
 		admin.DELETE("/books/:id", bookHandler.Delete)
 		admin.GET("/loans", loanHandler.AllLoans)
+
+		// Administración de laptops.
+		admin.POST("/laptops", laptopHandler.Create)
+		admin.GET("/laptops/all", laptopHandler.ListAll)
+		admin.GET("/laptop-loans", laptopHandler.AllLoans)
 	}
 }
